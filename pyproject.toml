@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "y-bayer"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.13.0"
+sqlalchemy = "^2.0.32"
+pydantic = "^2.8.2"
+dependency-injector= "4.42.0b1"
+scrapy = "^2.11.2"
+scrapy-splash ="^0.9.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
