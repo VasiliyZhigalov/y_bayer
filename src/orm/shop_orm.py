@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 class ShopOrm(Base):
     __tablename__ = 'shops'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     url = Column(String, nullable=False)
 

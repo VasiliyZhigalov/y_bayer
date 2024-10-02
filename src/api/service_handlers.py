@@ -1,10 +1,11 @@
-from sys import modules
-
 from aiogram.filters.command import Command
 from aiogram import types, Router
 import importlib
 import pkgutil
 import sys
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+from src.scraping.legacy.scraper import ProductSpider
 
 from src import repositories, orm, services, models, views
 from src.api import bot_handlers
@@ -37,3 +38,19 @@ async def reload_modules(message: types.Message):
     importlib.reload(bot_handlers)
     print("Модули успешно перезагружены!")
     await message.answer("Модули успешно перезагружены!")
+
+
+@service_router.message(Command("scrapy"))
+async def start_scrapy(message: types.Message):
+    '''
+    Запуск скрапера
+    :param message:
+    :return:
+    '''
+    await message.answer("Запуск парсинга...")
+
+    process = CrawlerProcess(get_project_settings())
+    process.crawl(ProductSpider)
+    process.start()
+
+    await message.answer("Парсинг завершён. Результаты сохранены.")

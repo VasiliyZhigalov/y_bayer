@@ -2,6 +2,7 @@ from typing import List, Dict
 
 from aiogram import Bot, Dispatcher, types
 
+from src.models.cart import Cart
 from src.models.user_request import UserRequest
 
 
@@ -41,7 +42,7 @@ class TelegramService:
         # Отправка сообщения
         await self.bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
 
-    async def show_cart_options(self, chat_id: int, carts: List[Dict]):
+    async def show_carts(self, chat_id: int, carts: List[Cart]):
         """
         Отображает кнопки с корзинами пользователя.
 
@@ -53,6 +54,5 @@ class TelegramService:
             return
         buttons = []
         for cart in carts:
-            button = types.InlineKeyboardButton(cart["shop_name"], callback_data=f"cart_{cart['id']}")
-        markup = self.ease_link_kb()
-        await self.bot.send_message(chat_id, "Выберите корзину:", reply_markup=markup)
+            # button = types.InlineKeyboardButton(cart["shop_name"], callback_data=f"cart_{cart['id']}")
+            await self.bot.send_message(chat_id, f'Корзина:{cart}')

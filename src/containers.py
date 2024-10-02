@@ -4,11 +4,13 @@ from aiogram import Bot, Dispatcher
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
+import duckdb_engine
+from src.repositories.cart_item_repository import CartItemRepository
 from src.repositories.cart_repository import CartRepository
 from src.repositories.product_repository import ProductRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.user_request_repository import UserRequestRepository
+from src.scraping.playwright_scraper import PlaywrightScraper
 from src.services.cart_service import CartService
 from src.services.product_service import ProductService
 from src.services.scraping_service import ScrapingService
@@ -23,11 +25,14 @@ class AppContainer(containers.DeclarativeContainer):
     bot = providers.Singleton(Bot, token='6879369889:AAHV4OlIswC_pEITX18r1h3_lwIzC6Jyv0E')
     dispatcher = providers.Singleton(Dispatcher, bot=bot)
 
-    engine = providers.Singleton(create_engine, url='sqlite:///shop_assistant.db', echo=False)
+    engine = providers.Singleton(create_engine, url='duckdb:///shop_assistant.db', echo=False)
     session_factory = providers.Singleton(sessionmaker, bind=engine)
+    scraper = providers.Singleton(PlaywrightScraper)
 
     user_repository = providers.Singleton(UserRepository, session=session_factory)
-    cart_repository = providers.Singleton(CartRepository, session=session_factory)
+    cart_item_repository = providers.Singleton(CartItemRepository, session=session_factory)
+    cart_repository = providers.Singleton(CartRepository, session=session_factory,
+                                          cart_item_repository=cart_item_repository)
     product_repository = providers.Singleton(ProductRepository, session=session_factory)
     user_request_repository = providers.Singleton(UserRequestRepository, session=session_factory)
 
@@ -37,4 +42,4 @@ class AppContainer(containers.DeclarativeContainer):
     telegram_service = providers.Singleton(TelegramService, bot=bot, dp=dispatcher)
     user_request_service = providers.Singleton(UserRequestService, user_request_repository=user_request_repository)
 
-    scraping_service = providers.Factory(ScrapingService)
+    scraping_service = providers.Factory(ScrapingService, scraper=scraper, cart_repository=cart_repository)

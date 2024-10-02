@@ -3,6 +3,7 @@ from aiogram import types, Router
 from dependency_injector.wiring import inject, Provide
 
 from src.containers import AppContainer
+from src.models.shop import Shop
 from src.models.user import User
 from src.models.user_request import UserRequest, RequestItem
 from src.services import user_request_service
@@ -73,17 +74,8 @@ async def handle_shopping_list(
     await telegram_service.send_user_request(user_id, user_request)
 
     # Парсинг данных из магазинов
-    shop_urls = ["https://shop1.example.com", "https://shop2.example.com"]  # Пример URL
-    parsed_data = scraping_service.fetch_products(shop_urls, user_request)
-
-    # Создание и сохранение корзин для каждого магазина
-    carts = []
-    for shop, products in parsed_data.items():
-        cart_items = [product_service.get_product_by_id(product['id']) for product in products]
-        cart = cart_service.create_cart(user_id, shop['id'], cart_items)
-        carts.append(cart)
+    metro = Shop(id=1, name='Metro', url='https://kuper.ru/metro/search?sid=211')
+    carts = await scraping_service.fetch_products([metro], user_request)
 
     # Отображение пользователю вариантов корзин
-    await telegram_service.show_cart_options(user_id, carts)
-
-
+    await telegram_service.show_carts(user_id, carts)
